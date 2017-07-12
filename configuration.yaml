@@ -1,0 +1,148 @@
+homeassistant:
+  # Name of the location where Home Assistant is running
+  name: ChoidiPel's Smart Home
+  # Location required to calculate the time the sun rises and sets
+  latitude: !secret latitude
+  longitude: !secret longitude
+  # Impacts weather/sunrise data (altitude above sea level in meters)
+  elevation: !secret elevation
+  # metric for Metric, imperial for Imperial
+  unit_system: metric
+  # Pick yours from here: http://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+  time_zone: Asia/Chongqing
+
+  #customize:
+  #  switch.wifiplug:
+  #    friendly_name: 开关
+  #    homebridge_name: 开关
+  
+
+# Show links to resources in log and frontend
+introduction:
+
+# Enables the frontend
+frontend:
+
+# Enables configuration UI
+config:
+
+http:
+  # Uncomment this to add a password (recommended!)
+  api_password: !secret http_password
+  # Uncomment this if you are using SSL or running in Docker etc
+  # base_url: example.duckdns.org:8123
+
+# Checks for available updates
+# Note: This component will send some information about your system to
+# the developers to assist with development of Home Assistant.
+# For more information, please see:
+# https://home-assistant.io/blog/2016/10/25/explaining-the-updater/
+updater:
+  # Optional, allows Home Assistant developers to focus on popular components.
+  # include_used_components: true
+
+# Discover some devices automatically
+discovery:
+
+# Allows you to issue voice commands from the frontend in enabled browsers
+conversation:
+
+# Enables support for tracking state changes over time.
+history:
+
+# View all events in a logbook
+logbook:
+
+# Track the sun
+sun:
+
+# Weather Prediction
+sensor:
+  - platform: yr
+    monitored_conditions:
+      - temperature
+      - symbol
+      - precipitation
+      - windSpeed
+      #- pressure
+      #- windDirection
+      #- humidity
+      #- fog
+      #- cloudiness
+      #- lowClouds
+      #- mediumClouds
+      #- highClouds
+      #- dewpointTemperature
+  - platform: random
+  - platform: command_line
+    name: CPU Temperature
+    command: "cat /sys/class/thermal/thermal_zone0/temp"
+    unit_of_measurement: "°C"
+    value_template: '{{ value | multiply(0.001) }}'
+  - platform: command_line
+    name: HA release
+    command: python3 -c "import requests; print(requests.get('https://pypi.python.org/pypi/homeassistant/json').json()['info']['version'])"
+  - platform: systemmonitor
+    resources:
+      - type: disk_use_percent
+        arg: /
+      - type: memory_use_percent
+      - type: load_1m
+      - type: load_5m
+      - type: load_15m
+      # - type: network_in
+      #   arg: wlan0
+      # - type: network_out
+      #   arg: wlan0
+      # - type: packets_in
+      #   arg: wlan0
+      # - type: packets_out
+      #   arg: wlan0
+
+# XiaoMi Wifi Plugin
+switch:
+  platform: xiaomi
+  host: 192.168.1.118
+  name: Wifiplug
+  token: !secret token
+
+# Nmap device track
+device_tracker:
+- platform: nmap_tracker
+  hosts: 192.168.1.100-120
+  exclude:
+  - 192.168.1.117   # Raspberry Pi
+  - 192.168.1.110   # pel's pc
+  track_new_device: false
+  home_interval : 10
+  interval_seconds: 30
+  consider_home: 180
+
+# Zone are
+zone:
+  name: Home
+  latitude: !secret latitude
+  longitude: !secret longitude
+  radius: 100
+  icon: mdi:home
+
+zone 2:
+  name: Test_school_zone
+  latitude: !secret school_latitude
+  longitude: !secret shcool_longtiude
+  radius: 250
+  icon: mdi:school
+
+# Develop state
+hello_state:
+  text: "Hello  World!"
+
+hello_service:
+
+
+# Text to speech
+tts:
+  platform: google
+
+group: !include groups.yaml
+automation: !include automations.yaml

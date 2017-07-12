@@ -1,0 +1,35 @@
+  - alias: Check sensor value and show notification
+    initial_state: 'off'
+    trigger:
+      platform: numeric_state
+      entity_id: sensor.random_sensor
+      above: 10
+    action:
+      - service: persistent_notification.create
+        data:
+          message: "Sensor value greater than 10"
+      - service: switch.toggle
+  
+  - alias: Check prensence and show notification
+    initial_state: 'off'
+    trigger:
+      platform: zone
+      entity_id: device_tracker.pel
+      zone: zone.home
+      event: enter
+    action:
+      - service: persistent_notification.create
+        data:
+          message: "Pel has come back!"
+      - service: switch.toggle
+
+
+  - alias: Turn on light when sun sets
+    initial_state: True
+    hide_entity: False
+    trigger:
+      platform: sun
+      event: sunset
+      offset: '-01:00:00'
+    action:
+      service: switch.turn_on 
